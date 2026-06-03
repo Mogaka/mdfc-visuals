@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microsoft Defender for Containers — Resources Hub</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-2: #161b22;
+      --panel: #21262d;
+      --panel-alt: #1b2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #0078d4;
+      --accent-2: #58a6ff;
+      --shadow: 0 20px 46px rgba(2, 6, 23, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, var(--bg) 0%, #111827 45%, #0f1724 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent-2); }
+
+    .page {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 28px 22px 48px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #c9d1d9;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .back-link:hover { color: var(--accent-2); }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(0, 120, 212, 0.16), rgba(33, 38, 45, 0.98));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 34px 32px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(88, 166, 255, 0.12);
+      color: #b6d7ff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 16px 0 12px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.08;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 920px;
+      color: #c9d1d9;
+      line-height: 1.65;
+      font-size: 1rem;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .summary-card {
+      background: rgba(13, 17, 23, 0.38);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .summary-card strong {
+      display: block;
+      font-size: 1.5rem;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .summary-card span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .category-card {
+      background: linear-gradient(180deg, rgba(33, 38, 45, 0.98), rgba(27, 33, 40, 0.98));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .category-card h2 {
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+      color: #dbeafe;
+    }
+
+    .resource-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .resource-item {
+      background: rgba(13, 17, 23, 0.42);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .resource-item a {
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .resource-item a:hover {
+      color: var(--accent-2);
+    }
+
+    .resource-item p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .resource-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(88, 166, 255, 0.1);
+      color: #b6d7ff;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 20px 14px 36px; }
+      .hero, .category-card { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a class="back-link" href="index.html">← Back to Overview</a>
+
+    <section class="hero">
+      <div class="eyebrow">📚 Curated Reference Library</div>
+      <h1>Microsoft Defender for Containers Resources Hub</h1>
+      <p>Curated official documentation, preview announcements, Tech Community blogs, video learning, and release tracking links for customer conversations, architectural planning, and ongoing enablement around container security in Microsoft Defender for Cloud.</p>
+      <div class="summary-grid">
+        <div class="summary-card"><strong>9</strong><span>Official documentation links</span></div>
+        <div class="summary-card"><strong>7</strong><span>Preview and announcement items</span></div>
+        <div class="summary-card"><strong>6</strong><span>Recent blog posts</span></div>
+        <div class="summary-card"><strong>3</strong><span>Video learning resources</span></div>
+        <div class="summary-card"><strong>5</strong><span>What's new and changelog links</span></div>
+      </div>
+    </section>
+
+    <section class="category-grid">
+      <article class="category-card">
+        <h2>📘 Official Documentation</h2>
+        <ul class="resource-list">
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-containers-introduction" target="_blank" rel="noopener noreferrer">Introduction to Microsoft Defender for Containers</a><p>Overview of the service, major value areas, and how Defender for Containers fits within Defender for Cloud.</p><span class="resource-meta">Microsoft Learn</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/support-matrix-defender-for-containers" target="_blank" rel="noopener noreferrer">Containers Support Matrix</a><p>Current feature availability by cloud, operating system, and support state across Azure, AWS, and GCP.</p><span class="resource-meta">Microsoft Learn</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-containers-architecture" target="_blank" rel="noopener noreferrer">Container Security Architecture</a><p>Reference architecture covering registry, deployment, runtime, and node protection patterns.</p><span class="resource-meta">Architecture</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/agentless-vulnerability-assessment-azure" target="_blank" rel="noopener noreferrer">Agentless Container VA</a><p>Explains agentless vulnerability assessment scenarios and prerequisites for supported environments.</p><span class="resource-meta">Assessment</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/kubernetes-workload-protections" target="_blank" rel="noopener noreferrer">Kubernetes Data Plane Hardening</a><p>Guidance for workload hardening and protection controls within Kubernetes data plane scenarios.</p><span class="resource-meta">Hardening</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-containers-enable-plan" target="_blank" rel="noopener noreferrer">Enable Defender for Containers</a><p>Step-by-step onboarding guidance for turning on the plan and connecting supported resources.</p><span class="resource-meta">Deployment</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/view-and-remediate-vulnerabilities-containers" target="_blank" rel="noopener noreferrer">View and Remediate Container Vulnerabilities</a><p>Operational workflow for triage, prioritization, and remediation of container vulnerability findings.</p><span class="resource-meta">Operations</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/container-image-mapping" target="_blank" rel="noopener noreferrer">Map Container Images Code to Runtime</a><p>Shows how image lineage and runtime mapping can connect build pipelines to running workloads.</p><span class="resource-meta">Code to Runtime</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/kubernetes-nodes-va" target="_blank" rel="noopener noreferrer">Kubernetes Node VA</a><p>Details node-level vulnerability assessment coverage and supported Kubernetes scenarios.</p><span class="resource-meta">Node Security</span></li>
+        </ul>
+      </article>
+
+      <article class="category-card">
+        <h2>🔬 Preview Announcements (2026)</h2>
+        <ul class="resource-list">
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/release-notes#kubernetes-misconfiguration-enforcement-in-defender-for-containers-preview" target="_blank" rel="noopener noreferrer">Kubernetes Misconfiguration Enforcement (Preview)</a><p>Preview announcement for stronger enforcement of Kubernetes misconfiguration scenarios.</p><span class="resource-meta">Jun 2026</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/release-notes#vulnerability-assessment-extended-to-runtime-discovered-container-images-on-eks-and-gke-preview" target="_blank" rel="noopener noreferrer">VA Extended to Runtime Images on EKS/GKE (Preview)</a><p>Expands runtime-discovered image vulnerability assessment to EKS and GKE environments.</p><span class="resource-meta">Jun 2026</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/release-notes#kubernetes-node-vulnerability-assessment-extended-to-eks-and-gke-preview" target="_blank" rel="noopener noreferrer">Kubernetes Node VA Extended to EKS/GKE (Preview)</a><p>Announces broader node vulnerability assessment support beyond Azure-native clusters.</p><span class="resource-meta">Jun 2026</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/release-notes#container-level-misconfiguration-recommendations-for-kubernetes-preview" target="_blank" rel="noopener noreferrer">Container-Level Misconfiguration Recommendations (Preview)</a><p>Introduces more granular configuration guidance at the container level for Kubernetes workloads.</p><span class="resource-meta">Jun 2026</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/release-notes#private-clusters-protection-for-gated-deployment-binary-drift-detection-and-malware-detection-preview" target="_blank" rel="noopener noreferrer">Private Clusters: Gated Deployment, Binary Drift, Malware (Preview)</a><p>Private-cluster protection updates spanning gated deployment, drift detection, and malware scenarios.</p><span class="resource-meta">May 2026</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/binary-drift-detection" target="_blank" rel="noopener noreferrer">Binary Drift Detection and Blocking</a><p>Deep dive into binary drift detection and emerging prevention controls.</p><span class="resource-meta">May 2026</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/runtime-gated-overview" target="_blank" rel="noopener noreferrer">Gated Deployment for Kubernetes</a><p>Explains how runtime-informed gating can be used as part of container deployment controls.</p><span class="resource-meta">Feb 2026</span></li>
+        </ul>
+      </article>
+
+      <article class="category-card">
+        <h2>✍️ Blog Posts (Tech Community)</h2>
+        <ul class="resource-list">
+          <li class="resource-item"><a href="https://techcommunity.microsoft.com/blog/microsoftdefendercloudblog/the-end-of-patching-era-for-containers-microsoft-defender-for-cloud-expands-hard/4524798" target="_blank" rel="noopener noreferrer">The End of Patching Era for Containers</a><p>Highlights the latest hardening and protection innovations for container security.</p><span class="resource-meta">Jun 2026</span></li>
+          <li class="resource-item"><a href="https://techcommunity.microsoft.com/blog/microsoftdefendercloudblog/start-secure-stay-secure-how-microsoft-is-closing-the-gap-from-code-to-runtime/4524580" target="_blank" rel="noopener noreferrer">Start Secure, Stay Secure: Code to Runtime (Build 2026)</a><p>Explains Microsoft's code-to-runtime strategy and how container security findings stay connected across the lifecycle.</p><span class="resource-meta">Build 2026</span></li>
+          <li class="resource-item"><a href="https://techcommunity.microsoft.com/blog/microsoftdefendercloudblog/new-innovations-in-microsoft-defender-to-strengthen-multi-cloud-containers-and-a/4503886" target="_blank" rel="noopener noreferrer">New Innovations: Multi-Cloud, Containers, and AI Model Security</a><p>Broad overview of new Defender for Cloud investments across multicloud and container protection.</p><span class="resource-meta">Mar 2026</span></li>
+          <li class="resource-item"><a href="https://techcommunity.microsoft.com/blog/microsoftdefendercloudblog/microsoft-defender-for-cloud-customer-newsletter/4516842" target="_blank" rel="noopener noreferrer">Defender for Cloud Newsletter — May 2026</a><p>Monthly roundup of recent feature releases, previews, and operational updates.</p><span class="resource-meta">May 2026</span></li>
+          <li class="resource-item"><a href="https://techcommunity.microsoft.com/blog/microsoftdefendercloudblog/microsoft-defender-for-cloud-customer-newsletter/4508180" target="_blank" rel="noopener noreferrer">Defender for Cloud Newsletter — April 2026</a><p>Monthly summary of platform changes useful for field readiness and customer follow-up.</p><span class="resource-meta">Apr 2026</span></li>
+          <li class="resource-item"><a href="https://techcommunity.microsoft.com/blog/microsoftdefendercloudblog/securing-multicloud-azure-aws--gcp-with-microsoft-defender-for-cloud-connector-b/4508563" target="_blank" rel="noopener noreferrer">Securing Multicloud Connector Best Practices</a><p>Practical guidance for connecting Azure, AWS, and GCP environments securely into Defender for Cloud.</p><span class="resource-meta">Apr 2026</span></li>
+        </ul>
+      </article>
+
+      <article class="category-card">
+        <h2>🎬 Videos</h2>
+        <ul class="resource-list">
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/shows/mdc-in-the-field/defender-for-containers" target="_blank" rel="noopener noreferrer">MDC in the Field — Defender for Containers Episode</a><p>Focused video session covering Defender for Containers scenarios and product walkthroughs.</p><span class="resource-meta">Video</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/shows/mdc-in-the-field/" target="_blank" rel="noopener noreferrer">MDC in the Field — Full Show Index</a><p>Browse the full Microsoft Defender for Cloud video catalog for adjacent topics and deeper product context.</p><span class="resource-meta">Show Index</span></li>
+          <li class="resource-item"><a href="https://www.youtube.com/playlist?list=PL3ZTgFEc7LysiX4PfHhdJPR7S8mGO14YS" target="_blank" rel="noopener noreferrer">Microsoft Security YouTube Playlist</a><p>Broader Microsoft Security video playlist with related episodes, demos, and product updates.</p><span class="resource-meta">YouTube</span></li>
+        </ul>
+      </article>
+
+      <article class="category-card">
+        <h2>📋 What's New / Changelog</h2>
+        <ul class="resource-list">
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/release-notes" target="_blank" rel="noopener noreferrer">Release Notes (Current)</a><p>The primary release notes feed for Microsoft Defender for Cloud changes and container security updates.</p><span class="resource-meta">Current</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/release-notes-archive" target="_blank" rel="noopener noreferrer">Release Notes Archive</a><p>Historical release documentation for looking up older platform announcements and feature rollouts.</p><span class="resource-meta">Archive</span></li>
+          <li class="resource-item"><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/release-notes-recommendations-alerts" target="_blank" rel="noopener noreferrer">Recommendations &amp; Alerts Updates</a><p>Track recommendation and alert-specific changes that often affect operational tuning and reporting.</p><span class="resource-meta">Recommendations</span></li>
+          <li class="resource-item"><a href="https://aka.ms/mdc/rss" target="_blank" rel="noopener noreferrer">RSS Feed (Subscribe)</a><p>Subscribe to Microsoft Defender for Cloud updates for easier ongoing monitoring.</p><span class="resource-meta">RSS</span></li>
+          <li class="resource-item"><a href="https://techcommunity.microsoft.com/category/azure/blog/microsoftdefendercloudblog" target="_blank" rel="noopener noreferrer">All MDFC Blog Posts</a><p>Master Tech Community category page for broader Defender for Cloud blog content.</p><span class="resource-meta">Tech Community</span></li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="footer">
+      Based on Microsoft Learn, Microsoft Tech Community, and Microsoft Security video resources for Microsoft Defender for Containers.<br />
+      Use the visuals pages for quick storytelling, then open these references for deeper technical follow-up.
+    </div>
+  </div>
+</body>
+</html>

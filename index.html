@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Defender for Containers — Security Coverage Maps</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1f2e 100%);
+            color: #e6edf3;
+            min-height: 100vh;
+            padding: 0;
+        }
+        .header {
+            background: linear-gradient(90deg, #0078d4 0%, #005a9e 100%);
+            padding: 40px 60px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-top: 12px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 32px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            border-color: #0078d4;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 120, 212, 0.15);
+        }
+        .card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .card h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #58a6ff;
+        }
+        .card p {
+            font-size: 0.95rem;
+            color: #8b949e;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        .card .tag {
+            display: inline-block;
+            background: #0078d4;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-top: 16px;
+            align-self: flex-start;
+        }
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: #8b949e;
+            font-size: 0.85rem;
+        }
+        .footer a { color: #58a6ff; text-decoration: none; }
+        @media (max-width: 768px) {
+            .header { padding: 30px 20px; }
+            .header h1 { font-size: 1.6rem; }
+            .container { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Microsoft Defender for Containers</h1>
+        <p>Security Coverage Visual Maps</p>
+        <span class="badge">Based on Official Support Matrix — June 2026</span>
+    </div>
+    <div class="container">
+        <div class="cards">
+            <a href="heatmap.html" class="card">
+                <div class="icon">🟩</div>
+                <h2>Heatmap Grid</h2>
+                <p>Interactive color-coded grid showing feature coverage across Azure, AWS, and GCP. Filter by cloud, hover for details, collapse sections.</p>
+                <span class="tag">Quick Reference</span>
+            </a>
+            <a href="architecture.html" class="card">
+                <div class="icon">🏗️</div>
+                <h2>Architecture Diagram</h2>
+                <p>Layered lifecycle view from Registry → Deploy → Runtime → Node. Shows which capabilities protect each stage and how they connect.</p>
+                <span class="tag">Presentations</span>
+            </a>
+            <a href="swimlane.html" class="card">
+                <div class="icon">🔀</div>
+                <h2>Swimlane by Scan Method</h2>
+                <p>Capabilities grouped by deployment mechanism: Agentless vs Agent-based vs Hybrid. Includes deployment decision tree.</p>
+                <span class="tag">Technical Planning</span>
+            </a>
+            <a href="comparison.html" class="card">
+                <div class="icon">☁️</div>
+                <h2>Cloud Comparison</h2>
+                <p>Side-by-side Azure vs AWS vs GCP parity infographic with GA scores, gap highlights, and recommendations.</p>
+                <span class="tag">Multi-Cloud Customers</span>
+            </a>
+        </div>
+    </div>
+    <div class="footer">
+        <p>Source: <a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/support-matrix-defender-for-containers" target="_blank">Microsoft Learn — Containers Support Matrix</a></p>
+        <p style="margin-top: 8px;">Prepared by CxE TCT Program Management</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Azure vs AWS vs GCP - Defender for Containers Parity</title>
+  <style>
+    :root {
+      --azure: #0078d4;
+      --aws: #ff9900;
+      --gcp: #4285f4;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #16324f;
+      --muted: #5f6f82;
+      --line: #d8e1eb;
+      --ok: #138a4b;
+      --preview: #b26a00;
+      --na: #7c8795;
+      --gap-bg: #ffe7e7;
+      --gap-border: #d64545;
+      --shadow: 0 10px 26px rgba(20, 44, 72, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #f8fbff 0%, #f4f7fb 100%);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .canvas {
+      background: var(--card);
+      border: 1px solid #e9eef4;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 28px 30px 22px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f8ff 100%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #eaf4ff;
+      color: var(--azure);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: 32px;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 980px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.3fr) repeat(3, minmax(240px, 1fr));
+      align-items: stretch;
+    }
+
+    .cell {
+      padding: 13px 16px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .grid > .cell:nth-child(4n) { border-right: none; }
+
+    .column-head {
+      padding: 22px 18px 20px;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .column-head.azure { background: linear-gradient(180deg, rgba(0,120,212,0.12), #fff); }
+    .column-head.aws { background: linear-gradient(180deg, rgba(255,153,0,0.14), #fff); }
+    .column-head.gcp { background: linear-gradient(180deg, rgba(66,133,244,0.13), #fff); }
+
+    .cloud-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 170px;
+    }
+
+    .cloud-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .logo.azure { background: var(--azure); }
+    .logo.aws { background: var(--aws); }
+    .logo.gcp { background: var(--gcp); }
+
+    .cloud-name {
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .score strong {
+      display: block;
+      font-size: 24px;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .progress {
+      width: 100%;
+      height: 12px;
+      background: #e9eef4;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .progress.azure > span { background: linear-gradient(90deg, #42a5f5, var(--azure)); width: 88.46%; }
+    .progress.aws > span { background: linear-gradient(90deg, #ffc266, var(--aws)); width: 61.54%; }
+    .progress.gcp > span { background: linear-gradient(90deg, #7eb0ff, var(--gcp)); width: 65.38%; }
+
+    .coverage-note {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .badge.best { background: #e7f6ec; color: var(--ok); }
+    .badge.watch { background: #fff3df; color: var(--preview); }
+    .badge.gap { background: #ffe3e3; color: #b42323; }
+
+    .feature-head {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 800;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .feature-title {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .category {
+      grid-column: 1 / -1;
+      background: #eff5fb;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--line);
+      border-top: 2px solid #d6e3f1;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #35526f;
+      text-transform: uppercase;
+    }
+
+    .feature-cell {
+      font-weight: 700;
+      background: #fbfdff;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 800;
+      min-height: 54px;
+      text-align: center;
+    }
+
+    .status small {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .ga { color: var(--ok); }
+    .preview { color: var(--preview); }
+    .na { color: var(--na); }
+    .missing { color: #b42323; }
+    .gap-cell {
+      background: var(--gap-bg);
+      box-shadow: inset 0 0 0 2px rgba(214,69,69,0.22);
+    }
+
+    .callouts {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      padding: 24px 28px 30px;
+      background: #fcfdff;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 20px;
+    }
+
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 19px;
+    }
+
+    .gap-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .gap-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #fff6f6;
+      border: 1px solid #ffd1d1;
+    }
+
+    .gap-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #d64545;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .gap-item strong { display: block; margin-bottom: 4px; }
+
+    .recommendation {
+      background: linear-gradient(180deg, #f4f9ff 0%, #ffffff 100%);
+      border: 1px solid #cfe0f3;
+    }
+
+    .recommendation p,
+    .panel p,
+    .gap-item div {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 0 28px 24px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .foot-accent { color: var(--text); }
+
+    @media (max-width: 1180px) {
+      .grid {
+        grid-template-columns: minmax(220px, 1.1fr) repeat(3, minmax(180px, 1fr));
+      }
+      .callouts { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
+      .page { padding: 14px; }
+      .grid {
+        display: block;
+      }
+      .grid .cell,
+      .category {
+        border-right: none !important;
+      }
+      .column-head { position: static; }
+      .mobile-note {
+        display: block;
+        padding: 16px 18px 0;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+    }
+
+    @media (min-width: 901px) {
+      .mobile-note { display: none; }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+      .page {
+        max-width: none;
+        padding: 0;
+      }
+      .actions { display: none; }
+      .canvas {
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+      }
+      .column-head { position: static; }
+      .btn { display: none !important; }
+      .hero, .callouts, .footer, .cell, .category { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="actions">
+      <button class="btn" onclick="copyAsImage()">Copy as Image</button>
+      <button class="btn" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <div class="canvas" id="infographic">
+      <section class="hero">
+        <div class="eyebrow">Multi-cloud comparison • Microsoft Defender for Containers</div>
+        <h1>Azure vs AWS vs GCP parity for Microsoft Defender for Containers</h1>
+        <p class="subtitle">
+          Side-by-side feature parity view for multi-cloud container security. Azure leads on runtime vulnerability assessment and node protection depth, while all three clouds show strong parity across core runtime detections and posture management.
+        </p>
+        <div class="legend">
+          <span><strong>✅</strong> GA</span>
+          <span><strong>⚠️</strong> Preview</span>
+          <span><strong>❌</strong> Not Available</span>
+          <span><strong>➖</strong> N/A</span>
+          <span><strong style="color:#b42323;">■</strong> Parity gap highlighted</span>
+        </div>
+      </section>
+
+      <div class="mobile-note">On smaller screens, sections stack vertically for readability.</div>
+
+      <section class="grid">
+        <div class="cell column-head">
+          <div class="feature-head">
+            <span>Feature comparison</span>
+            <span>26 features</span>
+          </div>
+          <div style="margin-top:10px;color:var(--muted);font-size:14px;line-height:1.45;">
+            Features are grouped by category. Red cells indicate material parity gaps where another cloud provides coverage and the compared cloud does not.
+          </div>
+        </div>
+
+        <div class="cell column-head azure">
+          <div class="cloud-card">
+            <div class="cloud-top">
+              <div class="logo-wrap">
+                <div class="logo azure">A</div>
+                <div>
+                  <div class="cloud-name">Azure</div>
+                  <div style="color:var(--muted);font-size:12px;font-weight:700;">Microsoft cloud-native lead</div>
+                </div>
+              </div>
+              <div class="score"><strong>23/26</strong> features GA</div>
+            </div>
+            <div class="progress azure"><span></span></div>
+            <div class="coverage-note"><span>GA coverage</span><span>88.5%</span></div>
+            <div class="badge-row">
+              <span class="badge best">Best in class</span>
+              <span class="badge best">Full VA breadth</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cell column-head aws">
+          <div class="cloud-card">
+            <div class="cloud-top">
+              <div class="logo-wrap">
+                <div class="logo aws">W</div>
+                <div>
+                  <div class="cloud-name">AWS</div>
+                  <div style="color:var(--muted);font-size:12px;font-weight:700;">Strong runtime parity</div>
+                </div>
+              </div>
+              <div class="score"><strong>16/26</strong> features GA</div>
+            </div>
+            <div class="progress aws"><span></span></div>
+            <div class="coverage-note"><span>GA coverage</span><span>61.5%</span></div>
+            <div class="badge-row">
+              <span class="badge watch">Preview-heavy on node security</span>
+              <span class="badge gap">Hardening gap</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cell column-head gcp">
+          <div class="cloud-card">
+            <div class="cloud-top">
+              <div class="logo-wrap">
+                <div class="logo gcp">G</div>
+                <div>
+                  <div class="cloud-name">GCP</div>
+                  <div style="color:var(--muted);font-size:12px;font-weight:700;">Balanced posture coverage</div>
+                </div>
+              </div>
+              <div class="score"><strong>17/26</strong> features GA</div>
+            </div>
+            <div class="progress gcp"><span></span></div>
+            <div class="coverage-note"><span>GA coverage</span><span>65.4%</span></div>
+            <div class="badge-row">
+              <span class="badge watch">Node protection in preview</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="category">Vulnerability assessment</div>
+        <div class="cell feature-cell">Registry Image VA (Linux)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Registry Image VA (Windows)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Runtime Container VA - Registry-based (Linux)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Runtime Container VA - Registry-based (Windows)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell gap-cell"><div class="status missing">❌ <div>Gap</div></div></div>
+        <div class="cell gap-cell"><div class="status missing">❌ <div>Gap</div></div></div>
+
+        <div class="cell feature-cell">Runtime Container VA - Registry-agnostic/Drift (Linux)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell gap-cell"><div class="status missing">❌ <div>Gap</div></div></div>
+        <div class="cell gap-cell"><div class="status missing">❌ <div>Gap</div></div></div>
+
+        <div class="cell feature-cell">Runtime Node VA (Linux)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+
+        <div class="cell feature-cell">Runtime Node VA (Windows)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell gap-cell"><div class="status missing">❌ <div>Gap</div></div></div>
+        <div class="cell gap-cell"><div class="status missing">❌ <div>Gap</div></div></div>
+
+        <div class="category">Runtime threat protection</div>
+        <div class="cell feature-cell">Control Plane Detection (Linux)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Control Plane Detection (Windows)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Workload Detection</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Binary Drift Detection</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Binary Drift Blocking</div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+
+        <div class="cell feature-cell">DNS Detection</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Antimalware</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Malware Detection - Nodes (Linux)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+
+        <div class="cell feature-cell">Malware Detection - Nodes (Windows)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+
+        <div class="cell feature-cell">Advanced Hunting in XDR</div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+
+        <div class="cell feature-cell">Response Actions in XDR</div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+        <div class="cell"><div class="status preview">⚠️ <div>Preview</div></div></div>
+
+        <div class="category">Security posture management</div>
+        <div class="cell feature-cell">Agentless Discovery for K8s</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Comprehensive Inventory</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Attack Path Analysis</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Enhanced Risk-Hunting</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Control Plane Hardening</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell gap-cell"><div class="status missing">❌ <div>Gap</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">Workload Hardening (Data Plane)</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="cell feature-cell">CIS K8s Benchmark</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+
+        <div class="category">Supply chain</div>
+        <div class="cell feature-cell">Gated Deployment</div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+        <div class="cell"><div class="status ga">✅ <div>GA</div></div></div>
+      </section>
+
+      <section class="callouts">
+        <div class="panel">
+          <h2>PARITY GAPS</h2>
+          <div class="gap-list">
+            <div class="gap-item">
+              <div class="gap-num">1</div>
+              <div><strong>Runtime Container VA (Windows)</strong> Azure only. AWS and GCP show a direct feature gap for Windows runtime image vulnerability assessment.</div>
+            </div>
+            <div class="gap-item">
+              <div class="gap-num">2</div>
+              <div><strong>Runtime Container VA (Drift Detection)</strong> Azure only. Registry-agnostic runtime drift VA is not available in AWS or GCP.</div>
+            </div>
+            <div class="gap-item">
+              <div class="gap-num">3</div>
+              <div><strong>Runtime Node VA</strong> Azure is GA; AWS and GCP remain in preview for Linux node assessment.</div>
+            </div>
+            <div class="gap-item">
+              <div class="gap-num">4</div>
+              <div><strong>Runtime Node VA (Windows)</strong> Azure only. No corresponding Windows node VA coverage in AWS or GCP.</div>
+            </div>
+            <div class="gap-item">
+              <div class="gap-num">5</div>
+              <div><strong>Control Plane Hardening</strong> Azure and GCP have GA coverage, while AWS does not.</div>
+            </div>
+            <div class="gap-item">
+              <div class="gap-num">6</div>
+              <div><strong>Malware Detection on Nodes</strong> Azure is GA on Linux and Windows nodes; AWS and GCP remain preview-only.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel recommendation">
+          <h2>Recommendation</h2>
+          <p>
+            For maximum security coverage, <strong class="foot-accent">Azure AKS provides the most comprehensive protection</strong>. For multi-cloud deployments, all three clouds share strong parity in runtime threat detection and posture management, but Azure differentiates on runtime vulnerability assessment depth, Windows coverage, and node security maturity.
+          </p>
+          <div style="height:16px"></div>
+          <h2 style="font-size:17px;">Executive takeaway</h2>
+          <p>
+            Multi-cloud customers can standardize on a broadly similar baseline across the three hyperscalers, but Azure currently offers the strongest end-to-end container security story when advanced runtime VA, Windows support, and hardened node coverage are required.
+          </p>
+        </div>
+      </section>
+
+      <div class="footer">
+        <div>Source: <span class="foot-accent">Microsoft Learn - Containers Support Matrix (June 2026)</span></div>
+        <div>Icons: ✅ GA &nbsp; ⚠️ Preview &nbsp; ❌ Not Available &nbsp; ➖ N/A</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function copyAsImage() {
+      const node = document.getElementById('infographic');
+      const rect = node.getBoundingClientRect();
+      const cloned = node.cloneNode(true);
+      cloned.style.margin = '0';
+      const serializer = new XMLSerializer();
+      const styleText = Array.from(document.querySelectorAll('style')).map(s => s.textContent).join('\n');
+      const foreign = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${Math.ceil(rect.width)}" height="${Math.ceil(rect.height)}">
+          <foreignObject width="100%" height="100%">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              <style>${styleText}</style>
+              ${serializer.serializeToString(cloned)}
+            </div>
+          </foreignObject>
+        </svg>`;
+
+      const blob = new Blob([foreign], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.ceil(rect.width) * 2;
+        canvas.height = Math.ceil(rect.height) * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(2, 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+
+        canvas.toBlob(async (pngBlob) => {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': pngBlob })
+            ]);
+            alert('Infographic copied as image.');
+          } catch (err) {
+            const link = document.createElement('a');
+            link.download = 'cloud-comparison-infographic.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            alert('Clipboard copy not available here. PNG downloaded instead.');
+          }
+        });
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        alert('Unable to render image for clipboard. Use Print / Save PDF instead.');
+      };
+
+      img.src = url;
+    }
+  </script>
+</body>
+</html>

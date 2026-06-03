@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Defender for Containers | Scan & Deployment Method Swimlane</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2d;
+      --panel-2: #15213a;
+      --text: #e8eefc;
+      --muted: #9fb0cf;
+      --border: rgba(255,255,255,0.09);
+      --azure: #0078d4;
+      --aws: #ff9900;
+      --gcp: #4285f4;
+      --ga: #57d18c;
+      --preview: #f5c451;
+      --no: #6f7b92;
+      --lane-a: linear-gradient(180deg, rgba(0,120,212,0.16), rgba(0,120,212,0.05));
+      --lane-b: linear-gradient(180deg, rgba(114,92,255,0.16), rgba(114,92,255,0.05));
+      --lane-c: linear-gradient(180deg, rgba(71,201,176,0.16), rgba(71,201,176,0.05));
+      --shadow: 0 18px 40px rgba(0,0,0,0.32);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: radial-gradient(circle at top, #13203a 0%, var(--bg) 45%); color: var(--text); font-family: "Segoe UI", Inter, Arial, sans-serif; }
+    body { padding: 28px; }
+    .wrap { max-width: 1680px; margin: 0 auto; }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px 30px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #7bc6ff;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    h1, h2, h3, h4, p { margin: 0; }
+    h1 { font-size: clamp(28px, 4vw, 42px); margin-bottom: 10px; }
+    .subtitle { color: var(--muted); max-width: 1100px; line-height: 1.55; }
+
+    .legend-row, .top-grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .top-grid { grid-template-columns: 1.2fr 1fr; }
+    .legend-row { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
+
+    .panel {
+      background: rgba(255,255,255,0.035);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 20px;
+    }
+
+    .meta-list, .status-list, .decision-list { display: grid; gap: 10px; margin-top: 14px; }
+    .meta-list { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+    .meta-item, .status-item, .decision-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .meta-item strong, .status-item strong { display: block; margin-bottom: 6px; }
+    .muted { color: var(--muted); }
+
+    .status-dot { font-weight: 700; margin-right: 8px; }
+    .ga { color: var(--ga); }
+    .preview { color: var(--preview); }
+    .na { color: var(--no); }
+
+    .lanes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 24px;
+    }
+
+    .lane {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lane.agentless { background: var(--lane-a), #101a2c; }
+    .lane.agentbased { background: var(--lane-b), #13192f; }
+    .lane.hybrid { background: var(--lane-c), #101f27; }
+
+    .lane-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(10px);
+      background: rgba(8, 12, 22, 0.55);
+      z-index: 2;
+    }
+
+    .lane-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .lane-subtitle { color: #c2d1ee; margin-top: 8px; font-size: 14px; line-height: 1.45; }
+    .component-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+    .component-tag, .tag, .plan-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      line-height: 1;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.07);
+      color: #f0f5ff;
+      white-space: nowrap;
+    }
+
+    .lane-body { padding: 16px; display: grid; gap: 18px; }
+    .category { display: grid; gap: 12px; }
+    .category-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: #b7c6e3;
+      padding-left: 4px;
+    }
+
+    .card {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(123,198,255,0.45);
+      box-shadow: 0 16px 30px rgba(0,0,0,0.25);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: auto -30% -55% auto;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08), rgba(255,255,255,0));
+      opacity: 0;
+      transition: opacity 180ms ease;
+      pointer-events: none;
+    }
+
+    .card:hover::after { opacity: 1; }
+    .card-head { display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; }
+    .card h4 { font-size: 18px; line-height: 1.25; margin-bottom: 8px; }
+    .card-note { color: var(--muted); font-size: 13px; line-height: 1.45; margin-top: 8px; }
+
+    .plan-tag {
+      background: rgba(0,0,0,0.22);
+      align-self: flex-start;
+      margin-left: 10px;
+      color: #cfe1ff;
+      text-align: right;
+      max-width: 48%;
+      white-space: normal;
+      line-height: 1.3;
+    }
+
+    .cloud-list { display: grid; gap: 10px; margin-top: 12px; }
+    .cloud-row {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.16);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .cloud-name {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding-top: 2px;
+    }
+    .cloud-name.azure { color: var(--azure); }
+    .cloud-name.aws { color: var(--aws); }
+    .cloud-name.gcp { color: var(--gcp); }
+
+    .support { display: flex; flex-wrap: wrap; gap: 8px 10px; font-size: 13px; line-height: 1.4; }
+    .support span {
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .requirements { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .tag { background: rgba(255,255,255,0.08); color: #d9e7ff; }
+    .tag.accent { background: rgba(123,198,255,0.12); color: #9fdbff; }
+    .tag.agent { background: rgba(177,131,255,0.14); color: #d0b8ff; }
+    .tag.hybrid { background: rgba(71,201,176,0.14); color: #9ff2df; }
+
+    .sections { display: grid; gap: 20px; }
+    .section-panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-title { font-size: 22px; margin-bottom: 8px; }
+    .section-subtitle { color: var(--muted); margin-bottom: 16px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #a9bddf; background: rgba(255,255,255,0.04); }
+    tr:last-child td { border-bottom: none; }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .decision-item strong { display: block; margin-bottom: 8px; font-size: 15px; }
+    .decision-item em { color: #90d1ff; font-style: normal; font-weight: 700; }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1200px) {
+      .lanes, .top-grid, .legend-row { grid-template-columns: 1fr; }
+      .lane-header { position: static; }
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 14px; }
+      .hero, .section-panel { padding: 18px; }
+      .card-head { flex-direction: column; }
+      .plan-tag { max-width: 100%; margin-left: 0; }
+      .cloud-row { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      :root {
+        --bg: #ffffff;
+        --panel: #ffffff;
+        --panel-2: #ffffff;
+        --text: #111111;
+        --muted: #444444;
+        --border: rgba(0,0,0,0.12);
+      }
+      html, body { background: #ffffff !important; color: #111111 !important; }
+      body { padding: 10mm; }
+      .hero, .lane, .section-panel, .panel, table, .card, .meta-item, .status-item, .decision-item { box-shadow: none !important; }
+      .lane.agentless, .lane.agentbased, .lane.hybrid, .hero, .section-panel, .panel, .card, .cloud-row, th {
+        background: #ffffff !important;
+      }
+      .component-tag, .tag, .plan-tag, .support span { border: 1px solid rgba(0,0,0,0.14); background: #f5f5f5 !important; color: #111111 !important; }
+      .lane-header { background: #ffffff !important; }
+      .card:hover { transform: none; }
+      a { color: #111111; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Deployment Architecture Reference</div>
+      <h1>Defender for Containers Capabilities by Scan / Deployment Method</h1>
+      <p class="subtitle">A technical swimlane view for selecting the right deployment architecture. Capabilities are grouped by the mechanism they rely on: <strong>agentless</strong>, <strong>agent-based</strong>, or <strong>hybrid</strong>. Cloud badges encode support by Azure, AWS, and GCP, including OS-specific status where relevant.</p>
+
+      <div class="top-grid">
+        <div class="panel">
+          <h3>How to read this diagram</h3>
+          <div class="meta-list">
+            <div class="meta-item"><strong>Lane meaning</strong><span class="muted">Each vertical swimlane shows the operational deployment pattern required for the feature to function.</span></div>
+            <div class="meta-item"><strong>Card content</strong><span class="muted">Cards show feature scope, per-cloud support, and the exact components technical teams must deploy.</span></div>
+            <div class="meta-item"><strong>Plan tag</strong><span class="muted">The tag on each card shows the licensing path that unlocks the capability.</span></div>
+            <div class="meta-item"><strong>Hover behavior</strong><span class="muted">Hover any card for emphasis and to inspect detailed requirements more easily on screen.</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Status legend</h3>
+          <div class="status-list">
+            <div class="status-item"><strong><span class="status-dot ga">●</span>GA</strong><span class="muted">Production-ready support.</span></div>
+            <div class="status-item"><strong><span class="status-dot preview">◐</span>Preview</strong><span class="muted">Available in preview; validate readiness before architectural standardization.</span></div>
+            <div class="status-item"><strong><span class="status-dot na">○</span>Not supported</strong><span class="muted">No supported implementation in the referenced cloud / OS combination.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lanes">
+      <article class="lane agentless">
+        <header class="lane-header">
+          <div class="lane-title"><span class="icon">◎</span> AGENTLESS</div>
+          <p class="lane-subtitle">Zero-footprint, API/snapshot-based capabilities. Best fit when minimizing cluster changes and leaning on registry, API, and snapshot access.</p>
+          <div class="component-strip">
+            <span class="component-tag">Registry Access</span>
+            <span class="component-tag">K8S API Access</span>
+            <span class="component-tag">Agentless Scanning for Machines</span>
+          </div>
+        </header>
+        <div class="lane-body">
+          <section class="category">
+            <div class="category-title">Vulnerability & malware scanning</div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Container Registry VA</h4>
+                  <div class="card-note">Registry-based image vulnerability assessment across all three clouds for Linux and Windows images.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers or Defender CSPM</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="ga">●</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="ga">●</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="ga">●</span> Windows</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag accent">Registry Access</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Runtime Container VA (Registry-based)</h4>
+                  <div class="card-note">Maps running containers back to registry images. Requires runtime inventory from either K8S API access or Defender Sensor.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers or Defender CSPM</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="ga">●</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="na">○</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="na">○</span> Windows</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag accent">Registry Access</span><span class="tag">K8S API Access</span><span class="tag agent">or Defender Sensor</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Runtime Container VA (Registry-agnostic / Drift)</h4>
+                  <div class="card-note">Snapshot-based container assessment for drift / registry-agnostic cases, paired with runtime inventory from K8S API access or Defender Sensor.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers or Defender CSPM</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="na">○</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="na">○</span> Not supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="na">○</span> Not supported</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag accent">Agentless Scanning for Machines</span><span class="tag">K8S API Access</span><span class="tag agent">or Defender Sensor</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Runtime Node VA</h4>
+                  <div class="card-note">Node-level vulnerability assessment from machine snapshots. Strongest coverage today is Azure; AWS and GCP are preview for Linux.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers or Defender for Servers P2 or Defender CSPM</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="ga">●</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="preview">◐</span> Linux</span><span><span class="na">○</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="preview">◐</span> Linux</span><span><span class="na">○</span> Windows</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag accent">Agentless Scanning for Machines</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Malware Detection (Nodes)</h4>
+                  <div class="card-note">Agentless malware analysis on node disks. Azure is GA; AWS and GCP coverage is preview for both Linux and Windows.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers or Defender for Servers P2</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="ga">●</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="preview">◐</span> Linux</span><span><span class="preview">◐</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="preview">◐</span> Linux</span><span><span class="preview">◐</span> Windows</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag accent">Agentless Scanning for Machines</span></div>
+            </div>
+          </section>
+
+          <section class="category">
+            <div class="category-title">Discovery, posture & control plane</div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Control Plane Detection (K8s Audit)</h4>
+                  <div class="card-note">Audit-based detections enabled with the plan. No extra deployment component beyond the plan itself.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="ga">●</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="ga">●</span> Windows</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Linux</span><span><span class="ga">●</span> Windows</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag">Enabled with plan</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Agentless Discovery for K8s</h4>
+                  <div class="card-note">API-based cluster and workload discovery without deploying a DaemonSet.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers or Defender CSPM</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag">K8S API Access</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Attack Path Analysis</h4>
+                  <div class="card-note">Uses discovered Kubernetes relationships to enrich attack path context across multicloud estate.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender CSPM</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag">K8S API Access</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Control Plane Hardening</h4>
+                  <div class="card-note">Free capability. Available for Azure and GCP control planes, but not available for AWS in this matrix.</div>
+                </div>
+                <div class="plan-tag">Plan: Free</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="na">○</span> Not available</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag">Enabled with plan</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>CIS K8s Benchmark</h4>
+                  <div class="card-note">Benchmark posture recommendations depend on Kubernetes API visibility and the relevant benchmark standard assignment.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers or Defender CSPM</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag">K8S API Access</span><span class="tag">Standard assigned</span></div>
+            </div>
+          </section>
+        </div>
+      </article>
+
+      <article class="lane agentbased">
+        <header class="lane-header">
+          <div class="lane-title"><span class="icon">⚙</span> AGENT-BASED</div>
+          <p class="lane-subtitle">Capabilities that depend on deployed components such as the Defender Sensor DaemonSet or Azure Policy for Kubernetes.</p>
+          <div class="component-strip">
+            <span class="component-tag">Defender Sensor (DaemonSet)</span>
+            <span class="component-tag">Azure Policy for K8s (Gatekeeper)</span>
+          </div>
+        </header>
+        <div class="lane-body">
+          <section class="category">
+            <div class="category-title">Runtime detection & protection</div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Binary Drift Detection</h4>
+                  <div class="card-note">Runtime binary drift visibility on Linux workloads via Defender Sensor.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag agent">Defender Sensor</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Binary Drift Blocking</h4>
+                  <div class="card-note">Preview preventive control. Requires Helm-based Defender Sensor deployment path.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="preview">◐</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="preview">◐</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="preview">◐</span> Linux</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag agent">Defender Sensor via Helm</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Workload Detection (Runtime Alerts)</h4>
+                  <div class="card-note">Behavioral runtime alerting for Linux workloads using Defender Sensor telemetry.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag agent">Defender Sensor</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>DNS Detection</h4>
+                  <div class="card-note">DNS-level runtime detections via Helm deployment of Defender Sensor.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag agent">Defender Sensor via Helm</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Antimalware</h4>
+                  <div class="card-note">Agent-based malware protections for Linux workloads with Helm-based Defender Sensor deployment.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag agent">Defender Sensor via Helm</span></div>
+            </div>
+          </section>
+
+          <section class="category">
+            <div class="category-title">Policy, gating & XDR integration</div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Workload Hardening (Data Plane)</h4>
+                  <div class="card-note">Policy-driven Kubernetes hardening via Azure Policy for Kubernetes using the AKS add-on or Arc extension.</div>
+                </div>
+                <div class="plan-tag">Plan: Free</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag agent">Azure Policy for K8s</span><span class="tag">AKS add-on or Arc extension</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Gated Deployment</h4>
+                  <div class="card-note">Admission-time security gating that combines sensor telemetry, security gating controls, findings, and registry visibility.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Linux</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag agent">Defender Sensor</span><span class="tag">Security Gating</span><span class="tag">Security Findings</span><span class="tag accent">Registry Access</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Advanced Hunting in XDR</h4>
+                  <div class="card-note">Preview XDR hunting integration based on Defender Sensor data collection.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="preview">◐</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="preview">◐</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="preview">◐</span> Supported</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag agent">Defender Sensor</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Response Actions in XDR</h4>
+                  <div class="card-note">Preview response workflows require both Defender Sensor and Kubernetes API connectivity.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="preview">◐</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="preview">◐</span> Linux</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="preview">◐</span> Linux</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag agent">Defender Sensor</span><span class="tag">K8S API Access</span></div>
+            </div>
+          </section>
+        </div>
+      </article>
+
+      <article class="lane hybrid">
+        <header class="lane-header">
+          <div class="lane-title"><span class="icon">⇄</span> HYBRID</div>
+          <p class="lane-subtitle">Agent for discovery, agentless for actual scanning. Best fit when teams want richer runtime inventory without shifting scan execution to the cluster.</p>
+          <div class="component-strip">
+            <span class="component-tag">Discovery via Defender Sensor</span>
+            <span class="component-tag">Scanning via Registry Pull / Disk Snapshot</span>
+          </div>
+        </header>
+        <div class="lane-body">
+          <section class="category">
+            <div class="category-title">Combined deployment pattern</div>
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Runtime Container VA (with Defender Sensor as discovery)</h4>
+                  <div class="card-note">Same runtime container VA coverage model as the agentless implementation, but container inventory comes from Defender Sensor instead of Kubernetes API access.</div>
+                </div>
+                <div class="plan-tag">Plan: Defender for Containers or Defender CSPM</div>
+              </div>
+              <div class="cloud-list">
+                <div class="cloud-row"><div class="cloud-name azure">Azure</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name aws">AWS</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+                <div class="cloud-row"><div class="cloud-name gcp">GCP</div><div class="support"><span><span class="ga">●</span> Supported</span></div></div>
+              </div>
+              <div class="requirements"><span class="tag hybrid">Agent component: Defender Sensor (discovery)</span><span class="tag accent">Agentless component: Registry pull or disk snapshot (scanning)</span></div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </section>
+
+    <section class="sections">
+      <div class="section-panel">
+        <h2 class="section-title">Component deployment summary</h2>
+        <p class="section-subtitle">Use this table to map deployment choices to the underlying operational components.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Deployment pattern</th>
+              <th>What it enables</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Registry Access</td>
+              <td>Agentless / Hybrid</td>
+              <td>Container Registry VA, runtime container VA (registry-based), gated deployment</td>
+              <td>Needed whenever image content must be pulled directly from the registry.</td>
+            </tr>
+            <tr>
+              <td>K8S API Access</td>
+              <td>Agentless</td>
+              <td>Agentless discovery, attack path analysis, CIS benchmark, runtime VA inventory, XDR response actions</td>
+              <td>Low-footprint path for runtime inventory and posture enrichment.</td>
+            </tr>
+            <tr>
+              <td>Agentless Scanning for Machines</td>
+              <td>Agentless / Hybrid</td>
+              <td>Runtime container VA (drift), runtime node VA, malware detection on nodes</td>
+              <td>Snapshot-based assessment on underlying nodes or machines.</td>
+            </tr>
+            <tr>
+              <td>Defender Sensor (DaemonSet)</td>
+              <td>Agent-based / Hybrid</td>
+              <td>Runtime detections, drift detection, antimalware, DNS detection, gated deployment, hybrid runtime VA discovery</td>
+              <td>Required for runtime telemetry-heavy scenarios and many XDR-aligned features.</td>
+            </tr>
+            <tr>
+              <td>Defender Sensor via Helm</td>
+              <td>Agent-based</td>
+              <td>Binary drift blocking, DNS detection, antimalware</td>
+              <td>Explicit Helm-based path called out for select runtime protection features.</td>
+            </tr>
+            <tr>
+              <td>Azure Policy for K8s</td>
+              <td>Agent-based</td>
+              <td>Workload hardening (data plane)</td>
+              <td>Delivered through AKS add-on or Arc extension depending on cluster model.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-panel">
+        <h2 class="section-title">Plan comparison</h2>
+        <p class="section-subtitle">Licensing path summary for common architecture questions.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Primary coverage in this diagram</th>
+              <th>Typical use in architecture decisions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Defender for Containers</td>
+              <td>Most runtime, discovery, vulnerability, and control plane features across all lanes</td>
+              <td>Choose when you need broad container security coverage, especially runtime detection and sensor-backed capabilities.</td>
+            </tr>
+            <tr>
+              <td>Defender CSPM</td>
+              <td>Agentless discovery, attack path analysis, CIS benchmark, registry VA, selected runtime VA paths</td>
+              <td>Choose when posture management and agentless security insights are the primary requirement.</td>
+            </tr>
+            <tr>
+              <td>Defender for Servers P2</td>
+              <td>Runtime node VA and malware detection on nodes</td>
+              <td>Choose when node- or machine-centric protection is the requirement, especially outside pure container-runtime needs.</td>
+            </tr>
+            <tr>
+              <td>Free</td>
+              <td>Control plane hardening and workload hardening (data plane)</td>
+              <td>Use as a baseline security posture layer even when premium runtime capabilities are not yet deployed.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-panel">
+        <h2 class="section-title">Deployment Decision Tree</h2>
+        <p class="section-subtitle">Fast path guidance for technical teams: if you need a specific outcome, deploy the minimum viable mechanism below.</p>
+        <div class="decision-grid">
+          <div class="decision-item"><strong>If you need broad vulnerability coverage without cluster agents</strong><span>Deploy <em>Registry Access</em> and, if node/container runtime context is needed, add <em>K8S API Access</em> or <em>Agentless Scanning for Machines</em>.</span></div>
+          <div class="decision-item"><strong>If you need runtime detections and Linux workload alerts</strong><span>Deploy <em>Defender Sensor</em>. This is the core path for runtime alerting, drift detection, DNS detection, and XDR-linked features.</span></div>
+          <div class="decision-item"><strong>If you need drift blocking, DNS detection, or antimalware</strong><span>Deploy <em>Defender Sensor via Helm</em> because the feature set explicitly calls for the Helm-based sensor path.</span></div>
+          <div class="decision-item"><strong>If you need posture and attack path visibility with minimal footprint</strong><span>Deploy <em>K8S API Access</em> and use the <em>agentless</em> lane for discovery, CIS benchmark, and attack path analysis.</span></div>
+          <div class="decision-item"><strong>If you need runtime container VA but prefer sensor-driven inventory</strong><span>Choose the <em>hybrid</em> model: Defender Sensor for discovery plus registry pull or disk snapshot for scanning.</span></div>
+          <div class="decision-item"><strong>If you need node VA or malware analysis on worker nodes</strong><span>Deploy <em>Agentless Scanning for Machines</em>; add the applicable plan path (Containers, Servers P2, or CSPM depending on the feature).</span></div>
+          <div class="decision-item"><strong>If you need admission/policy hardening rather than runtime telemetry</strong><span>Deploy <em>Azure Policy for K8s</em> for workload hardening. This is separate from Defender Sensor-based runtime capabilities.</span></div>
+          <div class="decision-item"><strong>If you need XDR hunting or response workflows</strong><span>Deploy <em>Defender Sensor</em>; for response actions, also provide <em>K8S API Access</em>.</span></div>
+        </div>
+        <p class="footer-note">Architecture shorthand: <strong>agentless</strong> minimizes cluster footprint, <strong>agent-based</strong> unlocks deeper runtime telemetry and enforcement, and <strong>hybrid</strong> is the bridge when discovery should be in-cluster but scanning should remain off-cluster.</p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
